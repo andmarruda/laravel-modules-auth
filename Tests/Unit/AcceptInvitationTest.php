@@ -9,7 +9,7 @@ use App\Modules\AuthModule\UseCases\AcceptInvitation\AcceptInvitation;
 use Carbon\Carbon;
 use Mockery;
 use Mockery\MockInterface;
-use Tests\TestCase;
+use App\Modules\AuthModule\Tests\TestCase;
 
 class AcceptInvitationTest extends TestCase
 {

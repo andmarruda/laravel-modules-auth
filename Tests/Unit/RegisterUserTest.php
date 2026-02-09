@@ -11,7 +11,7 @@ use App\Modules\AuthModule\UseCases\Register\RegisterUser;
 use Carbon\Carbon;
 use Mockery;
 use Mockery\MockInterface;
-use Tests\TestCase;
+use App\Modules\AuthModule\Tests\TestCase;
 
 class RegisterUserTest extends TestCase
 {

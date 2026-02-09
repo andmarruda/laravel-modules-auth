@@ -3,7 +3,7 @@
 namespace App\Modules\AuthModule\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use App\Modules\AuthModule\Tests\TestCase;
 use App\Modules\AuthModule\Models\Invitation;
 use App\Modules\AuthModule\Models\User;
 

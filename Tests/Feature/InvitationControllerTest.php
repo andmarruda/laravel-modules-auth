@@ -7,7 +7,7 @@ use App\Modules\AuthModule\Models\Invitation;
 use App\Modules\AuthModule\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
-use Tests\TestCase;
+use App\Modules\AuthModule\Tests\TestCase;
 
 class InvitationControllerTest extends TestCase
 {

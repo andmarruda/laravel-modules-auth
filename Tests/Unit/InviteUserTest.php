@@ -12,7 +12,7 @@ use App\Modules\AuthModule\Ports\Services\TokenGeneratorInterface;
 use App\Modules\AuthModule\UseCases\InviteUser\InviteUser;
 use Mockery;
 use Mockery\MockInterface;
-use Tests\TestCase;
+use App\Modules\AuthModule\Tests\TestCase;
 
 class InviteUserTest extends TestCase
 {
