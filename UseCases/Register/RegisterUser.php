@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Modules\AuthModule\UseCases\Register;
+namespace Andmarruda\AuthModule\UseCases\Register;
 
-use App\Modules\AuthModule\Ports\Repositories\InvitationRepositoryInterface;
-use App\Modules\AuthModule\Ports\Repositories\UserRepositoryInterface;
-use App\Modules\AuthModule\Ports\Services\AuditLoggerInterface;
+use Andmarruda\AuthModule\Ports\Repositories\InvitationRepositoryInterface;
+use Andmarruda\AuthModule\Ports\Repositories\UserRepositoryInterface;
+use Andmarruda\AuthModule\Ports\Services\AuditLoggerInterface;
 
 class RegisterUser
 {
@@ -34,6 +34,7 @@ class RegisterUser
             'name' => $name,
             'email' => $invitation->email,
             'password' => $password,
+            'article_coins_balance' => 2,
         ]);
 
         $this->invitations->markAsAccepted($invitation);

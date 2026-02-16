@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Modules\AuthModule\UseCases\InviteUser;
+namespace Andmarruda\AuthModule\UseCases\InviteUser;
 
-use App\Modules\AuthModule\Models\User;
-use App\Modules\AuthModule\Ports\Repositories\InvitationRepositoryInterface;
-use App\Modules\AuthModule\Ports\Repositories\UserRepositoryInterface;
-use App\Modules\AuthModule\Ports\Services\AuditLoggerInterface;
-use App\Modules\AuthModule\Ports\Services\InvitationMailerInterface;
-use App\Modules\AuthModule\Ports\Services\TokenGeneratorInterface;
+use Andmarruda\AuthModule\Models\User;
+use Andmarruda\AuthModule\Ports\Repositories\InvitationRepositoryInterface;
+use Andmarruda\AuthModule\Ports\Repositories\UserRepositoryInterface;
+use Andmarruda\AuthModule\Ports\Services\AuditLoggerInterface;
+use Andmarruda\AuthModule\Ports\Services\InvitationMailerInterface;
+use Andmarruda\AuthModule\Ports\Services\TokenGeneratorInterface;
 
 class InviteUser
 {

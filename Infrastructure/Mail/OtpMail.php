@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Modules\AuthModule\Infrastructure\Mail;
+namespace Andmarruda\AuthModule\Infrastructure\Mail;
 
-use App\Modules\AuthModule\Models\Otp;
-use App\Modules\AuthModule\Models\User;
+use Andmarruda\AuthModule\Models\Otp;
+use Andmarruda\AuthModule\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -22,7 +22,7 @@ class OtpMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Seu codigo de verificacao - ContentPilot AI',
+            subject: 'Seu codigo de verificacao - VisibilityRank AI',
         );
     }
 

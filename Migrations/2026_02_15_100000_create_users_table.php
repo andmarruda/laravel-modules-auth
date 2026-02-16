@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->boolean('is_manager')->default(false);
+            $table->unsignedInteger('article_coins_balance')->default(2);
             $table->rememberToken();
             $table->timestamps();
         });

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Modules\AuthModule\Tests\Feature;
+namespace Andmarruda\AuthModule\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Modules\AuthModule\Tests\TestCase;
-use App\Modules\AuthModule\Models\Invitation;
-use App\Modules\AuthModule\Models\User;
+use Andmarruda\AuthModule\Tests\TestCase;
+use Andmarruda\AuthModule\Models\Invitation;
+use Andmarruda\AuthModule\Models\User;
 
 class UserControllerTest extends TestCase
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Modules\AuthModule\Ports\Repositories;
+namespace Andmarruda\AuthModule\Ports\Repositories;
 
-use App\Modules\AuthModule\Models\Otp;
+use Andmarruda\AuthModule\Models\Otp;
 
 interface OtpRepositoryInterface
 {

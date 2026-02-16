@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Modules\AuthModule\Factories;
+namespace Andmarruda\AuthModule\Factories;
 
-use App\Modules\AuthModule\Models\User;
+use Andmarruda\AuthModule\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Modules\AuthModule\Models\User>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Andmarruda\AuthModule\Models\User>
  */
 class UserFactory extends Factory
 {

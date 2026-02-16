@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Modules\AuthModule\Ports\Repositories;
+namespace Andmarruda\AuthModule\Ports\Repositories;
 
-use App\Modules\AuthModule\Models\User;
+use Andmarruda\AuthModule\Models\User;
 
 interface UserRepositoryInterface
 {
@@ -11,4 +11,8 @@ interface UserRepositoryInterface
     public function findByEmail(string $email): ?User;
 
     public function emailExists(string $email): bool;
+
+    public function findById(int $id): ?User;
+
+    public function save(User $user): User;
 }

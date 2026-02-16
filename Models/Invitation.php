@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Modules\AuthModule\Models;
+namespace Andmarruda\AuthModule\Models;
 
-use App\Modules\AuthModule\Factories\InvitationFactory;
+use Andmarruda\AuthModule\Factories\InvitationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Modules\AuthModule\UseCases\AcceptInvitation;
+namespace Andmarruda\AuthModule\UseCases\AcceptInvitation;
 
-use App\Modules\AuthModule\Ports\Repositories\InvitationRepositoryInterface;
-use App\Modules\AuthModule\Ports\Services\AuditLoggerInterface;
+use Andmarruda\AuthModule\Ports\Repositories\InvitationRepositoryInterface;
+use Andmarruda\AuthModule\Ports\Services\AuditLoggerInterface;
 
 class AcceptInvitation
 {

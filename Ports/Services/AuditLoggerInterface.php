@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Modules\AuthModule\Ports\Services;
+namespace Andmarruda\AuthModule\Ports\Services;
 
-use App\Modules\AuthModule\Models\Invitation;
-use App\Modules\AuthModule\Models\User;
+use Andmarruda\AuthModule\Models\Invitation;
+use Andmarruda\AuthModule\Models\User;
 
 interface AuditLoggerInterface
 {
@@ -12,4 +12,12 @@ interface AuditLoggerInterface
     public function logInvitationAccepted(Invitation $invitation, ?string $ipAddress = null, ?string $userAgent = null): void;
 
     public function logUserRegistered(User $user, Invitation $invitation, ?string $ipAddress = null, ?string $userAgent = null): void;
+
+    public function logProfileUpdated(User $user, array $changedFields, ?string $ipAddress = null, ?string $userAgent = null): void;
+
+    public function logPasswordResetRequested(User $user, ?string $ipAddress = null, ?string $userAgent = null): void;
+
+    public function logPasswordChanged(User $user, ?string $ipAddress = null, ?string $userAgent = null): void;
+
+    public function logAccountDeleted(User $user, ?string $ipAddress = null, ?string $userAgent = null): void;
 }

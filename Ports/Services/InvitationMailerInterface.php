@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Modules\AuthModule\Ports\Services;
+namespace Andmarruda\AuthModule\Ports\Services;
 
-use App\Modules\AuthModule\Models\Invitation;
+use Andmarruda\AuthModule\Models\Invitation;
 
 interface InvitationMailerInterface
 {

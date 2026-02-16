@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Modules\AuthModule\UseCases\Register;
+namespace Andmarruda\AuthModule\UseCases\Register;
 
-use App\Modules\AuthModule\Models\User;
+use Andmarruda\AuthModule\Models\User;
 
 class RegisterUserResult
 {

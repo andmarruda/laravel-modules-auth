@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Modules\AuthModule\Infrastructure\Persistence;
+namespace Andmarruda\AuthModule\Infrastructure\Persistence;
 
-use App\Modules\AuthModule\Models\Otp;
-use App\Modules\AuthModule\Ports\Repositories\OtpRepositoryInterface;
+use Andmarruda\AuthModule\Models\Otp;
+use Andmarruda\AuthModule\Ports\Repositories\OtpRepositoryInterface;
 
 class EloquentOtpRepository implements OtpRepositoryInterface
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Modules\AuthModule\Tests;
+namespace Andmarruda\AuthModule\Tests;
 
-use App\Modules\AuthModule\AuthModuleServiceProvider;
+use Andmarruda\AuthModule\AuthModuleServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 abstract class TestCase extends OrchestraTestCase

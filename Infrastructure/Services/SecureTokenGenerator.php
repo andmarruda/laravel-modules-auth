@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Modules\AuthModule\Infrastructure\Services;
+namespace Andmarruda\AuthModule\Infrastructure\Services;
 
-use App\Modules\AuthModule\Ports\Services\TokenGeneratorInterface;
+use Andmarruda\AuthModule\Ports\Services\TokenGeneratorInterface;
 
 class SecureTokenGenerator implements TokenGeneratorInterface
 {

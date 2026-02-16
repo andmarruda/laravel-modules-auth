@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Modules\AuthModule\Infrastructure\Mail;
+namespace Andmarruda\AuthModule\Infrastructure\Mail;
 
-use App\Modules\AuthModule\Models\Invitation;
+use Andmarruda\AuthModule\Models\Invitation;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Modules\AuthModule\UseCases\Otp;
+namespace Andmarruda\AuthModule\UseCases\Otp;
 
-use App\Modules\AuthModule\Models\Otp;
+use Andmarruda\AuthModule\Models\Otp;
 
 class GenerateAndSendOtpResult
 {

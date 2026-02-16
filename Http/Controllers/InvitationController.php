@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Modules\AuthModule\Http\Controllers;
+namespace Andmarruda\AuthModule\Http\Controllers;
 
-use App\Modules\AuthModule\UseCases\AcceptInvitation\AcceptInvitation;
-use App\Modules\AuthModule\UseCases\InviteUser\InviteUser;
+use Andmarruda\AuthModule\UseCases\AcceptInvitation\AcceptInvitation;
+use Andmarruda\AuthModule\UseCases\InviteUser\InviteUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;

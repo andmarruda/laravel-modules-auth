@@ -40,79 +40,46 @@ AuthModule/
 ## Requirements
 
 - PHP 8.1+
-- Laravel 10+
+- Laravel 11+
 - A configured mail driver (for sending invitations)
 - A configured queue worker (invitations use `Mail::queue()`)
 
 ## Installation
 
-### 1. Copy the module
-
-Place the `AuthModule` directory inside your Laravel project. A common convention:
-
-```
-app/
-  Modules/
-    AuthModule/
-      AuthModuleServiceProvider.php
-      ...
-```
-
-### 2. Set the namespace
-
-The module classes use the namespace matching their location. If you place it under `app/Modules/AuthModule`, ensure your `composer.json` autoloads it:
-
-```json
-{
-  "autoload": {
-    "psr-4": {
-      "App\\Modules\\AuthModule\\": "app/Modules/AuthModule/"
-    }
-  }
-}
-```
-
-Then run:
+### 1. Install via Composer
 
 ```bash
-composer dump-autoload
+composer require andmarruda/authmodule
 ```
 
-### 3. Register the service provider
+### 2. Register the service provider
 
-Add the service provider to your `bootstrap/providers.php` (Laravel 11+):
+For Laravel 11+, the provider is auto-discovered via Composer.
+
+If auto-discovery is disabled in your app, add the provider manually in `bootstrap/providers.php`:
 
 ```php
 return [
     // ...
-    App\Modules\AuthModule\AuthModuleServiceProvider::class,
+    Andmarruda\AuthModule\AuthModuleServiceProvider::class,
 ];
-```
-
-Or in `config/app.php` (Laravel 10):
-
-```php
-'providers' => [
-    // ...
-    App\Modules\AuthModule\AuthModuleServiceProvider::class,
-],
 ```
 
 The service provider automatically:
 - Binds all interfaces to their Eloquent/Mail implementations
 - Loads routes, migrations, and views
 
-### 4. Run migrations
+### 3. Run migrations
 
 ```bash
 php artisan migrate
 ```
 
-This creates three tables: `users`, `invitations`, and `auth_audit_logs`.
+This creates module tables such as `invitations`, `auth_audit_logs`, `otps`, and `user_preferences`, plus updates `users` when needed.
 
-> **Note:** The module ships its own `users` table migration. If your project already has one, remove or adjust the module's `0001_01_01_000000_create_users_table.php` migration to avoid conflicts.
+> **Note:** The module ships its own `users` table migration. If your project already has one, remove or adjust the module's `2026_02_15_100000_create_users_table.php` migration to avoid conflicts.
 
-### 5. Configure the invitation URL
+### 4. Configure the invitation URL
 
 Invitation emails include a link pointing to your frontend. Set the base URL in your `.env`:
 
@@ -124,7 +91,7 @@ The generated link format is: `{FRONTEND_URL}/invitations/accept?token={TOKEN}`
 
 Falls back to `APP_URL` if `FRONTEND_URL` is not set.
 
-### 6. Configure mail and queue
+### 5. Configure mail and queue
 
 Make sure your mail driver and queue worker are properly configured so invitation emails are sent:
 
@@ -147,6 +114,10 @@ php artisan queue:work
 | `POST` | `/invitations/create` | Create an invitation | Yes (manager only) |
 | `POST` | `/invitations/accept` | Accept an invitation | No |
 | `POST` | `/users/register` | Register via invitation token | No |
+| `GET` | `/auth/social/{provider}/redirect` | Start OAuth login (`google`, `github`) | No |
+| `GET` | `/auth/social/{provider}/callback` | OAuth callback | No |
+| `GET` | `/auth/social/profile/status` | Get missing profile fields after social auth | Yes |
+| `POST` | `/auth/social/profile/complete` | Complete missing profile data | Yes |
 
 ### Create an invitation (manager only)
 
@@ -220,6 +191,69 @@ Content-Type: application/json
                   Creates the user account
 ```
 
+### Social login (Google/GitHub)
+
+This package supports `google` and `github` with Laravel Socialite.
+
+1. Add provider credentials to your `.env`:
+
+```env
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+GOOGLE_REDIRECT_URI="${APP_URL}/auth/social/google/callback"
+
+GITHUB_CLIENT_ID=...
+GITHUB_CLIENT_SECRET=...
+GITHUB_REDIRECT_URI="${APP_URL}/auth/social/github/callback"
+```
+
+2. Configure `config/services.php` in your Laravel app:
+
+```php
+'google' => [
+    'client_id' => env('GOOGLE_CLIENT_ID'),
+    'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+    'redirect' => env('GOOGLE_REDIRECT_URI'),
+],
+
+'github' => [
+    'client_id' => env('GITHUB_CLIENT_ID'),
+    'client_secret' => env('GITHUB_CLIENT_SECRET'),
+    'redirect' => env('GITHUB_REDIRECT_URI'),
+],
+```
+
+3. (Optional) publish and tune package config:
+
+```bash
+php artisan vendor:publish --tag=authmodule-config
+```
+
+`config/authmodule.php` lets you customize allowed providers, scopes, and post-login/error redirects.
+
+For onboarding after social login, configure:
+- `authmodule.profile.required_user_fields`
+- `authmodule.profile.required_preference_keys`
+- `authmodule.profile.redirect_to_onboarding`
+
+4. Manual test flow:
+
+```text
+GET /auth/social/google/redirect
+-> provider consent screen
+-> /auth/social/google/callback
+-> user is created/linked and authenticated
+-> if profile is incomplete, redirected to onboarding path
+```
+
+5. (Optional) Protect app routes until profile is complete:
+
+```php
+Route::middleware(['auth', 'authmodule.profile.complete'])->group(function () {
+    Route::get('/dashboard', fn () => 'ok');
+});
+```
+
 ## Creating a manager
 
 The first manager must be created manually (via tinker, a seeder, or a direct DB update):
@@ -229,7 +263,7 @@ php artisan tinker
 ```
 
 ```php
-use App\Modules\AuthModule\Models\User;
+use Andmarruda\AuthModule\Models\User;
 
 User::create([
     'name'       => 'Admin',
@@ -248,7 +282,7 @@ From there, managers can invite other users through the API.
 The module uses interface bindings, so you can replace any implementation. Override the bindings in your own service provider:
 
 ```php
-use App\Modules\AuthModule\Ports\Services\InvitationMailerInterface;
+use Andmarruda\AuthModule\Ports\Services\InvitationMailerInterface;
 use App\CustomInvitationMailer;
 
 public function register(): void
@@ -309,8 +343,8 @@ Or with PHPUnit directly:
 ### Using factories in your own tests
 
 ```php
-use App\Modules\AuthModule\Models\User;
-use App\Modules\AuthModule\Models\Invitation;
+use Andmarruda\AuthModule\Models\User;
+use Andmarruda\AuthModule\Models\Invitation;
 
 // Create a manager
 $manager = User::factory()->manager()->create();

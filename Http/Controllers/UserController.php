@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Modules\AuthModule\Http\Controllers;
+namespace Andmarruda\AuthModule\Http\Controllers;
 
-use App\Modules\AuthModule\UseCases\Register\RegisterUser;
+use Andmarruda\AuthModule\UseCases\Register\RegisterUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;

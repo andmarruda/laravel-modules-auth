@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\AuthModule\Models;
+namespace Andmarruda\AuthModule\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

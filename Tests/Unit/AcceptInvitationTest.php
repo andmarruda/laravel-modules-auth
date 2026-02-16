@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Modules\AuthModule\Tests\Unit;
+namespace Andmarruda\AuthModule\Tests\Unit;
 
-use App\Modules\AuthModule\Models\Invitation;
-use App\Modules\AuthModule\Ports\Repositories\InvitationRepositoryInterface;
-use App\Modules\AuthModule\Ports\Services\AuditLoggerInterface;
-use App\Modules\AuthModule\UseCases\AcceptInvitation\AcceptInvitation;
+use Andmarruda\AuthModule\Models\Invitation;
+use Andmarruda\AuthModule\Ports\Repositories\InvitationRepositoryInterface;
+use Andmarruda\AuthModule\Ports\Services\AuditLoggerInterface;
+use Andmarruda\AuthModule\UseCases\AcceptInvitation\AcceptInvitation;
 use Carbon\Carbon;
 use Mockery;
 use Mockery\MockInterface;
-use App\Modules\AuthModule\Tests\TestCase;
+use Andmarruda\AuthModule\Tests\TestCase;
 
 class AcceptInvitationTest extends TestCase
 {

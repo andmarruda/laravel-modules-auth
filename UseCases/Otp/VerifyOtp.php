@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Modules\AuthModule\UseCases\Otp;
+namespace Andmarruda\AuthModule\UseCases\Otp;
 
-use App\Modules\AuthModule\Ports\Repositories\OtpRepositoryInterface;
-use App\Modules\AuthModule\Ports\Repositories\UserRepositoryInterface;
+use Andmarruda\AuthModule\Ports\Repositories\OtpRepositoryInterface;
+use Andmarruda\AuthModule\Ports\Repositories\UserRepositoryInterface;
 
 class VerifyOtp
 {

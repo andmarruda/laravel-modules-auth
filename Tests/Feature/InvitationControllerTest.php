@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Modules\AuthModule\Tests\Feature;
+namespace Andmarruda\AuthModule\Tests\Feature;
 
-use App\Modules\AuthModule\Infrastructure\Mail\InvitationMail;
-use App\Modules\AuthModule\Models\Invitation;
-use App\Modules\AuthModule\Models\User;
+use Andmarruda\AuthModule\Infrastructure\Mail\InvitationMail;
+use Andmarruda\AuthModule\Models\Invitation;
+use Andmarruda\AuthModule\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
-use App\Modules\AuthModule\Tests\TestCase;
+use Andmarruda\AuthModule\Tests\TestCase;
 
 class InvitationControllerTest extends TestCase
 {

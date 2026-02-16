@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Modules\AuthModule\UseCases\Otp;
+namespace Andmarruda\AuthModule\UseCases\Otp;
 
-use App\Modules\AuthModule\Models\User;
-use App\Modules\AuthModule\Ports\Repositories\OtpRepositoryInterface;
-use App\Modules\AuthModule\Ports\Services\OtpMailerInterface;
+use Andmarruda\AuthModule\Models\User;
+use Andmarruda\AuthModule\Ports\Repositories\OtpRepositoryInterface;
+use Andmarruda\AuthModule\Ports\Services\OtpMailerInterface;
 
 class GenerateAndSendOtp
 {

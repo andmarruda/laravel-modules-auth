@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Modules\AuthModule\UseCases\InviteUser;
+namespace Andmarruda\AuthModule\UseCases\InviteUser;
 
-use App\Modules\AuthModule\Models\Invitation;
+use Andmarruda\AuthModule\Models\Invitation;
 
 class InviteUserResult
 {

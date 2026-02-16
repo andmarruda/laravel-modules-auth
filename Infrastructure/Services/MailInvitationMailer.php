@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Modules\AuthModule\Infrastructure\Services;
+namespace Andmarruda\AuthModule\Infrastructure\Services;
 
-use App\Modules\AuthModule\Infrastructure\Mail\InvitationMail;
-use App\Modules\AuthModule\Models\Invitation;
-use App\Modules\AuthModule\Ports\Services\InvitationMailerInterface;
+use Andmarruda\AuthModule\Infrastructure\Mail\InvitationMail;
+use Andmarruda\AuthModule\Models\Invitation;
+use Andmarruda\AuthModule\Ports\Services\InvitationMailerInterface;
 use Illuminate\Support\Facades\Mail;
 
 class MailInvitationMailer implements InvitationMailerInterface

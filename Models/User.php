@@ -1,15 +1,18 @@
 <?php
 
-namespace App\Modules\AuthModule\Models;
+namespace Andmarruda\AuthModule\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Modules\AuthModule\Factories\UserFactory;
+use Andmarruda\AuthModule\Factories\UserFactory;
+use App\Modules\AuthorizationModule\Contracts\Authorizable;
+use App\Modules\AuthorizationModule\Traits\HasAuthorization;
 
-class User extends Authenticatable
+class User extends Authenticatable implements Authorizable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasAuthorization;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +24,8 @@ class User extends Authenticatable
         'email',
         'password',
         'is_manager',
+        'article_coins_balance',
+        'profile_completed_at',
     ];
 
     /**
@@ -44,6 +49,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_manager' => 'boolean',
+            'article_coins_balance' => 'integer',
+            'profile_completed_at' => 'datetime',
         ];
     }
 
@@ -65,5 +72,33 @@ class User extends Authenticatable
     protected static function newFactory()
     {
         return UserFactory::new();
+    }
+
+    public function preferences(): HasMany
+    {
+        return $this->hasMany(UserPreference::class);
+    }
+
+    public function socialAccounts(): HasMany
+    {
+        return $this->hasMany(SocialAccount::class);
+    }
+
+    public function getPreference(string $key, ?string $default = null): ?string
+    {
+        /** @var UserPreference|null $preference */
+        $preference = $this->preferences()
+            ->where('key', $key)
+            ->first();
+
+        return $preference?->value ?? $default;
+    }
+
+    public function setPreference(string $key, ?string $value): void
+    {
+        $this->preferences()->updateOrCreate(
+            ['key' => $key],
+            ['value' => $value],
+        );
     }
 }

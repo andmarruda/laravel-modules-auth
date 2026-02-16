@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Modules\AuthModule\Infrastructure\Services;
+namespace Andmarruda\AuthModule\Infrastructure\Services;
 
-use App\Modules\AuthModule\Infrastructure\Mail\OtpMail;
-use App\Modules\AuthModule\Models\Otp;
-use App\Modules\AuthModule\Models\User;
-use App\Modules\AuthModule\Ports\Services\OtpMailerInterface;
+use Andmarruda\AuthModule\Infrastructure\Mail\OtpMail;
+use Andmarruda\AuthModule\Infrastructure\Mail\PasswordResetOtpMail;
+use Andmarruda\AuthModule\Models\Otp;
+use Andmarruda\AuthModule\Models\User;
+use Andmarruda\AuthModule\Ports\Services\OtpMailerInterface;
 use Illuminate\Support\Facades\Mail;
 
 class MailOtpMailer implements OtpMailerInterface
@@ -13,6 +14,12 @@ class MailOtpMailer implements OtpMailerInterface
     public function sendOtp(User $user, Otp $otp): void
     {
         Mail::to($user->email)
-            ->queue(new OtpMail($user, $otp));
+            ->send(new OtpMail($user, $otp));
+    }
+
+    public function sendPasswordResetOtp(User $user, Otp $otp): void
+    {
+        Mail::to($user->email)
+            ->send(new PasswordResetOtpMail($user, $otp));
     }
 }

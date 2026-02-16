@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Modules\AuthModule\Infrastructure\Persistence;
+namespace Andmarruda\AuthModule\Infrastructure\Persistence;
 
-use App\Modules\AuthModule\Models\Invitation;
-use App\Modules\AuthModule\Ports\Repositories\InvitationRepositoryInterface;
+use Andmarruda\AuthModule\Models\Invitation;
+use Andmarruda\AuthModule\Ports\Repositories\InvitationRepositoryInterface;
 
 class EloquentInvitationRepository implements InvitationRepositoryInterface
 {

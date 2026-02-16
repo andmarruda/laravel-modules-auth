@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Modules\AuthModule\Infrastructure\Persistence;
+namespace Andmarruda\AuthModule\Infrastructure\Persistence;
 
-use App\Modules\AuthModule\Models\User;
-use App\Modules\AuthModule\Ports\Repositories\UserRepositoryInterface;
+use Andmarruda\AuthModule\Models\User;
+use Andmarruda\AuthModule\Ports\Repositories\UserRepositoryInterface;
 
 class EloquentUserRepository implements UserRepositoryInterface
 {
@@ -20,5 +20,17 @@ class EloquentUserRepository implements UserRepositoryInterface
     public function emailExists(string $email): bool
     {
         return User::where('email', $email)->exists();
+    }
+
+    public function findById(int $id): ?User
+    {
+        return User::find($id);
+    }
+
+    public function save(User $user): User
+    {
+        $user->save();
+
+        return $user;
     }
 }

@@ -1,21 +1,23 @@
 <?php
 
-namespace App\Modules\AuthModule;
+namespace Andmarruda\AuthModule;
 
-use App\Modules\AuthModule\Infrastructure\Persistence\EloquentInvitationRepository;
-use App\Modules\AuthModule\Infrastructure\Persistence\EloquentOtpRepository;
-use App\Modules\AuthModule\Infrastructure\Persistence\EloquentUserRepository;
-use App\Modules\AuthModule\Infrastructure\Services\EloquentAuditLogger;
-use App\Modules\AuthModule\Infrastructure\Services\MailInvitationMailer;
-use App\Modules\AuthModule\Infrastructure\Services\MailOtpMailer;
-use App\Modules\AuthModule\Infrastructure\Services\SecureTokenGenerator;
-use App\Modules\AuthModule\Ports\Repositories\InvitationRepositoryInterface;
-use App\Modules\AuthModule\Ports\Repositories\OtpRepositoryInterface;
-use App\Modules\AuthModule\Ports\Repositories\UserRepositoryInterface;
-use App\Modules\AuthModule\Ports\Services\AuditLoggerInterface;
-use App\Modules\AuthModule\Ports\Services\InvitationMailerInterface;
-use App\Modules\AuthModule\Ports\Services\OtpMailerInterface;
-use App\Modules\AuthModule\Ports\Services\TokenGeneratorInterface;
+use Andmarruda\AuthModule\Infrastructure\Persistence\EloquentInvitationRepository;
+use Andmarruda\AuthModule\Infrastructure\Persistence\EloquentOtpRepository;
+use Andmarruda\AuthModule\Infrastructure\Persistence\EloquentUserRepository;
+use Andmarruda\AuthModule\Infrastructure\Services\EloquentAuditLogger;
+use Andmarruda\AuthModule\Infrastructure\Services\MailInvitationMailer;
+use Andmarruda\AuthModule\Infrastructure\Services\MailOtpMailer;
+use Andmarruda\AuthModule\Infrastructure\Services\SecureTokenGenerator;
+use Andmarruda\AuthModule\Http\Middleware\EnsureSocialProfileIsComplete;
+use Andmarruda\AuthModule\Ports\Repositories\InvitationRepositoryInterface;
+use Andmarruda\AuthModule\Ports\Repositories\OtpRepositoryInterface;
+use Andmarruda\AuthModule\Ports\Repositories\UserRepositoryInterface;
+use Andmarruda\AuthModule\Ports\Services\AuditLoggerInterface;
+use Andmarruda\AuthModule\Ports\Services\InvitationMailerInterface;
+use Andmarruda\AuthModule\Ports\Services\OtpMailerInterface;
+use Andmarruda\AuthModule\Ports\Services\TokenGeneratorInterface;
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 
 class AuthModuleServiceProvider extends ServiceProvider
@@ -32,13 +34,21 @@ class AuthModuleServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        //
+        $this->mergeConfigFrom(__DIR__ . '/Config/authmodule.php', 'authmodule');
     }
 
     public function boot(): void
     {
+        $this->app->make(Router::class)->aliasMiddleware(
+            'authmodule.profile.complete',
+            EnsureSocialProfileIsComplete::class,
+        );
+
         $this->loadRoutesFrom(__DIR__ . '/Http/Routes/web.php');
         $this->loadMigrationsFrom(__DIR__ . '/Migrations');
         $this->loadViewsFrom(__DIR__ . '/Resources/views', 'authmodule');
+        $this->publishes([
+            __DIR__ . '/Config/authmodule.php' => config_path('authmodule.php'),
+        ], 'authmodule-config');
     }
 }
