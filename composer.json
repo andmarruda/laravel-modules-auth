@@ -16,6 +16,9 @@
         "orchestra/testbench": "^9.0",
         "mockery/mockery": "^1.6"
     },
+    "suggest": {
+        "laravel/sanctum": "Optional API token authentication support for auth:sanctum routes."
+    },
     "autoload": {
         "psr-4": {
             "Andmarruda\\AuthModule\\": ""

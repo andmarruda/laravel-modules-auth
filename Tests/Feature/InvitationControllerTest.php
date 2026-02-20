@@ -43,6 +43,24 @@ class InvitationControllerTest extends TestCase
         });
     }
 
+    public function test_manager_can_invite_user_with_sanctum_guard(): void
+    {
+        $manager = User::factory()->manager()->create();
+
+        $response = $this->actingAs($manager, 'sanctum')
+            ->postJson('/invitations/create', [
+                'email' => 'sanctumuser@example.com',
+            ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('data.email', 'sanctumuser@example.com');
+
+        $this->assertDatabaseHas('invitations', [
+            'email' => 'sanctumuser@example.com',
+            'invited_by' => $manager->id,
+        ]);
+    }
+
     public function test_manager_can_invite_user_with_resource_scope(): void
     {
         $manager = User::factory()->manager()->create();

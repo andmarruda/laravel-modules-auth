@@ -61,6 +61,7 @@ class RegisterUserTest extends TestCase
                 'name' => $name,
                 'email' => $invitation->email,
                 'password' => $password,
+                'article_coins_balance' => 2,
             ])
             ->andReturn($expectedUser);
 

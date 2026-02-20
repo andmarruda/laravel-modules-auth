@@ -11,6 +11,8 @@ A self-contained Laravel module for **invitation-based user registration** with 
 - **Secure tokens** -- 64-character hex tokens generated with `random_bytes()`
 - **Idempotent acceptance** -- accepting an already-accepted invitation safely returns success
 - **Resource scoping** -- optional `resource_scope` field for multi-tenant or permission scenarios
+- **Native teams** -- users can belong to multiple teams and teams can contain multiple users
+- **Hybrid auth ready** -- session (`web`) remains default, optional `sanctum` guard can be enabled per route group
 
 ## Architecture
 
@@ -43,6 +45,7 @@ AuthModule/
 - Laravel 11+
 - A configured mail driver (for sending invitations)
 - A configured queue worker (invitations use `Mail::queue()`)
+- No dependency on `AuthorizationModule` (or `Authorizable`/`HasAuthorization` concerns)
 
 ## Installation
 
@@ -75,9 +78,10 @@ The service provider automatically:
 php artisan migrate
 ```
 
-This creates module tables such as `invitations`, `auth_audit_logs`, `otps`, and `user_preferences`, plus updates `users` when needed.
+This creates module tables such as `invitations`, `teams`, `team_user`, `team_invitations`, `auth_audit_logs`, `otps`, and `user_preferences`, plus updates `users` when needed.
 
 > **Note:** The module ships its own `users` table migration. If your project already has one, remove or adjust the module's `2026_02_15_100000_create_users_table.php` migration to avoid conflicts.
+> **Upgrade note:** If you already applied an older `team_invitations` migration with `invited_by`, run the package upgrade migration (`2026_02_20_101100_migrate_team_invitations_to_morphable_inviter.php`) to migrate to `inviter_type`/`inviter_id` and remove the legacy column.
 
 ### 4. Configure the invitation URL
 
@@ -114,6 +118,12 @@ php artisan queue:work
 | `POST` | `/invitations/create` | Create an invitation | Yes (manager only) |
 | `POST` | `/invitations/accept` | Accept an invitation | No |
 | `POST` | `/users/register` | Register via invitation token | No |
+| `POST` | `/teams` | Create a new team | Yes |
+| `GET` | `/teams/mine` | List current user teams | Yes |
+| `POST` | `/teams/invitations/create` | Invite user to team | Yes |
+| `GET` | `/teams/invitations/resolve?token=...` | Resolve invitation and detect account existence | No |
+| `POST` | `/teams/invitations/redeem` | Redeem invitation (existing user path) | Optional auth |
+| `POST` | `/teams/invitations/register` | Register from team invitation (new user path) | No |
 | `GET` | `/auth/social/{provider}/redirect` | Start OAuth login (`google`, `github`) | No |
 | `GET` | `/auth/social/{provider}/callback` | OAuth callback | No |
 | `GET` | `/auth/social/profile/status` | Get missing profile fields after social auth | Yes |
@@ -277,6 +287,40 @@ From there, managers can invite other users through the API.
 
 ## Customization
 
+### Session + Sanctum
+
+The package supports `web` (session) and `sanctum` (API token) at the same time.
+
+Publish config and set guards per route group:
+
+```bash
+php artisan vendor:publish --tag=authmodule-config
+```
+
+```php
+'auth' => [
+    'default_guard' => 'web',
+    'session_guard' => 'web',
+    'api_guard' => 'sanctum', // optional
+    'invitation_create_guards' => ['web', 'sanctum'],
+    'social_profile_guards' => ['web', 'sanctum'],
+    'preferences_guards' => ['web', 'sanctum'],
+    'teams_guards' => ['web', 'sanctum'],
+],
+'teams' => [
+    'inviter_models' => [
+        'user' => \Andmarruda\AuthModule\Models\User::class,
+        'tenant' => \App\Models\Tenant::class, // optional
+    ],
+    'inviter_authorizer' => \Andmarruda\AuthModule\Support\DefaultTeamInvitationInviterAuthorizer::class,
+],
+```
+
+By default, protected endpoints accept both session (`web`) and API token (`sanctum`) authentication.
+If you enable `sanctum` guards, install/configure Sanctum in the host app.
+When creating team invitations, send `inviter_type` (`user`/`tenant`) and `inviter_id` if you want a non-user inviter context.
+The default authorizer only allows the authenticated user to be the inviter; provide your own authorizer class to validate tenant contexts.
+
 ### Swapping implementations
 
 The module uses interface bindings, so you can replace any implementation. Override the bindings in your own service provider:
@@ -320,13 +364,7 @@ The module includes both unit and feature tests.
 ### Running tests
 
 ```bash
-php artisan test app/Modules/AuthModule/Tests
-```
-
-Or with PHPUnit directly:
-
-```bash
-./vendor/bin/phpunit app/Modules/AuthModule/Tests
+./vendor/bin/phpunit
 ```
 
 ### Test coverage
@@ -402,6 +440,42 @@ $accepted = Invitation::factory()->accepted()->create();
 | `ip_address` | string | nullable |
 | `user_agent` | text | nullable |
 | `created_at` | timestamp | |
+
+### `teams`
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | bigint | PK |
+| `name` | string | |
+| `slug` | string | unique |
+| `owner_id` | FK -> users | cascade on delete |
+| `created_at` / `updated_at` | timestamps | |
+
+### `team_user`
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | bigint | PK |
+| `team_id` | FK -> teams | cascade on delete |
+| `user_id` | FK -> users | cascade on delete |
+| `role` | string | default `member` |
+| `joined_at` | timestamp | nullable |
+| `created_at` / `updated_at` | timestamps | |
+
+### `team_invitations`
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | bigint | PK |
+| `team_id` | FK -> teams | cascade on delete |
+| `email` | string | indexed with `accepted_at` |
+| `token` | string(64) | unique |
+| `inviter_type` | string | morph type (`User`, `Tenant`, etc.) |
+| `inviter_id` | bigint | morph id |
+| `role` | string | default `member` |
+| `expires_at` | timestamp | |
+| `accepted_at` | timestamp | nullable |
+| `created_at` / `updated_at` | timestamps | |
 
 ## License
 

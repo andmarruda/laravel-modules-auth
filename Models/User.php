@@ -3,16 +3,15 @@
 namespace Andmarruda\AuthModule\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Andmarruda\AuthModule\Factories\UserFactory;
-use App\Modules\AuthorizationModule\Contracts\Authorizable;
-use App\Modules\AuthorizationModule\Traits\HasAuthorization;
 
-class User extends Authenticatable implements Authorizable
+class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasAuthorization;
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -82,6 +81,13 @@ class User extends Authenticatable implements Authorizable
     public function socialAccounts(): HasMany
     {
         return $this->hasMany(SocialAccount::class);
+    }
+
+    public function teams(): BelongsToMany
+    {
+        return $this->belongsToMany(Team::class, 'team_user')
+            ->withPivot(['role', 'joined_at'])
+            ->withTimestamps();
     }
 
     public function getPreference(string $key, ?string $default = null): ?string

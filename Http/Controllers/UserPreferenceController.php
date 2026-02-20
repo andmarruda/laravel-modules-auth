@@ -3,7 +3,7 @@
 namespace Andmarruda\AuthModule\Http\Controllers;
 
 use Andmarruda\AuthModule\Models\User;
-use Filament\Facades\Filament;
+use Andmarruda\AuthModule\Support\AuthenticatedUserResolver;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -25,7 +25,7 @@ class UserPreferenceController extends Controller
             'value' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $user = Filament::auth()->user();
+        $user = AuthenticatedUserResolver::resolve($request);
 
         if (! $user instanceof User) {
             return response()->json(['message' => 'Unauthenticated.'], 401);
