@@ -2,6 +2,8 @@
 
 namespace Andmarruda\AuthModule\Models;
 
+use Andmarruda\AuthorizationModule\Contracts\Authorizable as AuthorizationAuthorizable;
+use Andmarruda\AuthorizationModule\Traits\HasAuthorization;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,9 +11,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Andmarruda\AuthModule\Factories\UserFactory;
 
-class User extends Authenticatable
+class User extends Authenticatable implements AuthorizationAuthorizable
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
+    use HasAuthorization;
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.

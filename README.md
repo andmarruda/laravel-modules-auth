@@ -45,7 +45,7 @@ AuthModule/
 - Laravel 11+
 - A configured mail driver (for sending invitations)
 - A configured queue worker (invitations use `Mail::queue()`)
-- No dependency on `AuthorizationModule` (or `Authorizable`/`HasAuthorization` concerns)
+- Depends on `andmarruda/authorization-module` (`Authorizable`/`HasAuthorization`)
 
 ## Installation
 
