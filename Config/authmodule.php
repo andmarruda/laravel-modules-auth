@@ -10,6 +10,17 @@ return [
         'preferences_guards' => ['web', 'sanctum'],
         'teams_guards' => ['web', 'sanctum'],
     ],
+    'jwt' => [
+        'algorithm' => env('AUTHMODULE_JWT_ALGORITHM', 'RS256'),
+        'secret' => env('AUTHMODULE_JWT_SECRET', env('APP_KEY', '')),
+        'private_key' => env('AUTHMODULE_JWT_PRIVATE_KEY', ''),
+        'public_key' => env('AUTHMODULE_JWT_PUBLIC_KEY', ''),
+        'private_key_passphrase' => env('AUTHMODULE_JWT_PRIVATE_KEY_PASSPHRASE', ''),
+        'key_id' => env('AUTHMODULE_JWT_KEY_ID', ''),
+        'ttl_minutes' => (int) env('AUTHMODULE_JWT_TTL_MINUTES', 60),
+        'issuer' => env('AUTHMODULE_JWT_ISSUER', env('APP_URL', 'authmodule')),
+        'leeway_seconds' => (int) env('AUTHMODULE_JWT_LEEWAY_SECONDS', 0),
+    ],
     'teams' => [
         'max_teams_per_user' => null,
         'invitation_ttl_days' => 7,

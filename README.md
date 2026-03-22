@@ -13,6 +13,7 @@ A self-contained Laravel module for **invitation-based user registration** with 
 - **Resource scoping** -- optional `resource_scope` field for multi-tenant or permission scenarios
 - **Native teams** -- users can belong to multiple teams and teams can contain multiple users
 - **Hybrid auth ready** -- session (`web`) remains default, optional `sanctum` guard can be enabled per route group
+- **JWT auth ready** -- native `jwt` guard with bearer token issuance endpoint (`/auth/jwt/token`)
 
 ## Architecture
 
@@ -118,6 +119,7 @@ php artisan queue:work
 | `POST` | `/invitations/create` | Create an invitation | Yes (manager only) |
 | `POST` | `/invitations/accept` | Accept an invitation | No |
 | `POST` | `/users/register` | Register via invitation token | No |
+| `POST` | `/auth/jwt/token` | Issue JWT token from email/password | No |
 | `POST` | `/teams` | Create a new team | Yes |
 | `GET` | `/teams/mine` | List current user teams | Yes |
 | `POST` | `/teams/invitations/create` | Invite user to team | Yes |
@@ -320,6 +322,76 @@ By default, protected endpoints accept both session (`web`) and API token (`sanc
 If you enable `sanctum` guards, install/configure Sanctum in the host app.
 When creating team invitations, send `inviter_type` (`user`/`tenant`) and `inviter_id` if you want a non-user inviter context.
 The default authorizer only allows the authenticated user to be the inviter; provide your own authorizer class to validate tenant contexts.
+
+### JWT (native)
+
+You can also use the built-in `jwt` guard for bearer authentication.
+Default algorithm is `RS256` (recommended for multi-client/mobile/public API scenarios).
+`EdDSA` (Ed25519) is also supported when `libsodium` is available.
+
+Configuration keys:
+
+```php
+'jwt' => [
+    'algorithm' => env('AUTHMODULE_JWT_ALGORITHM', 'RS256'),
+    'secret' => env('AUTHMODULE_JWT_SECRET', env('APP_KEY', '')),
+    'private_key' => env('AUTHMODULE_JWT_PRIVATE_KEY', ''),
+    'public_key' => env('AUTHMODULE_JWT_PUBLIC_KEY', ''),
+    'private_key_passphrase' => env('AUTHMODULE_JWT_PRIVATE_KEY_PASSPHRASE', ''),
+    'key_id' => env('AUTHMODULE_JWT_KEY_ID', ''),
+    'ttl_minutes' => (int) env('AUTHMODULE_JWT_TTL_MINUTES', 60),
+    'issuer' => env('AUTHMODULE_JWT_ISSUER', env('APP_URL', 'authmodule')),
+    'leeway_seconds' => (int) env('AUTHMODULE_JWT_LEEWAY_SECONDS', 0),
+],
+```
+
+Minimal `.env` for `RS256`:
+
+```env
+AUTHMODULE_JWT_ALGORITHM=RS256
+AUTHMODULE_JWT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
+AUTHMODULE_JWT_PUBLIC_KEY="-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----"
+AUTHMODULE_JWT_KEY_ID=primary-rsa-key-2026
+```
+
+For `EdDSA`, set `AUTHMODULE_JWT_ALGORITHM=EdDSA` and provide base64 keys:
+
+```env
+AUTHMODULE_JWT_PRIVATE_KEY=base64:...
+AUTHMODULE_JWT_PUBLIC_KEY=base64:...
+```
+
+Token endpoint:
+
+```http
+POST /auth/jwt/token
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "your-password"
+}
+```
+
+Generate EdDSA keys + ready-to-use env file:
+
+```bash
+php artisan authmodule:jwt:eddsa-keys
+```
+
+Useful options:
+
+```bash
+php artisan authmodule:jwt:eddsa-keys --path=storage/app/authmodule/jwt --env-file=.env.authmodule.jwt --force
+php artisan authmodule:jwt:eddsa-keys --stdout
+```
+
+The command creates:
+- `eddsa-private.key.b64`
+- `eddsa-public.key.b64`
+- env variables for `AUTHMODULE_JWT_ALGORITHM`, `AUTHMODULE_JWT_PRIVATE_KEY`, `AUTHMODULE_JWT_PUBLIC_KEY`, `AUTHMODULE_JWT_KEY_ID`, and `AUTHMODULE_JWT_TTL_MINUTES`.
+
+If `ext-sodium` is not available, the command exits with guidance to install/enable it.
 
 ### Swapping implementations
 

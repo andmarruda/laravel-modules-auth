@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Andmarruda\AuthModule\Http\Controllers\{
     InvitationController,
+    JwtAuthController,
     UserController,
     SocialAuthController,
     UserPreferenceController,
@@ -39,6 +40,13 @@ Route::group([
     'as' => 'users.',
 ], function () {
     Route::post('/register', [UserController::class, 'register'])->name('register');
+});
+
+Route::group([
+    'prefix' => 'auth/jwt',
+    'as' => 'auth.jwt.',
+], function () {
+    Route::post('/token', [JwtAuthController::class, 'token'])->name('token');
 });
 
 Route::group([

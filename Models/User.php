@@ -26,6 +26,8 @@ class User extends Authenticatable implements AuthorizationAuthorizable
         'name',
         'email',
         'password',
+        'profile_image',
+        'theme_mode',
         'is_manager',
         'article_coins_balance',
         'profile_completed_at',
