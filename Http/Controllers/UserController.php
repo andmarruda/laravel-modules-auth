@@ -2,47 +2,35 @@
 
 namespace Andmarruda\AuthModule\Http\Controllers;
 
-use Andmarruda\AuthModule\UseCases\Register\RegisterUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
 class UserController extends Controller
 {
-    public function __construct(
-        private RegisterUser $registerUser,
-    ) {}
+    public function __construct(private AuthController $authController)
+    {
+    }
 
     public function register(Request $request): JsonResponse
     {
-        $validated = $request->validate([
+        $request->validate([
             'token' => ['required', 'string'],
-            'name' => ['required', 'string', 'max:255'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        $result = $this->registerUser->execute(
-            token: $validated['token'],
-            name: $validated['name'],
-            password: $validated['password'],
-            ipAddress: $request->ip(),
-            userAgent: $request->userAgent(),
-        );
+        $response = $this->authController->register($request);
+        $data = $response->getData(true);
 
-        if (!$result->success) {
-            return match ($result->error) {
-                'invitation_not_found' => response()->json(['message' => 'Invitation not found.'], 404),
-                'invitation_already_used' => response()->json(['message' => 'Invitation already used.'], 410),
-                'invitation_expired' => response()->json(['message' => 'Invitation expired.'], 410),
-            };
+        if (($response->getStatusCode() >= 400) || !is_array($data)) {
+            return $response;
         }
 
         return response()->json([
             'data' => [
-                'id' => $result->user->id,
-                'name' => $result->user->name,
-                'email' => $result->user->email,
+                'id' => $data['id'] ?? data_get($data, 'user.id'),
+                'name' => $data['name'] ?? data_get($data, 'user.name'),
+                'email' => $data['email'] ?? data_get($data, 'user.email'),
             ],
-        ], 201);
+        ], $response->getStatusCode(), $response->headers->all());
     }
 }

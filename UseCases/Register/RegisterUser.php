@@ -34,7 +34,6 @@ class RegisterUser
             'name' => $name,
             'email' => $invitation->email,
             'password' => $password,
-            'article_coins_balance' => 2,
         ]);
 
         $this->invitations->markAsAccepted($invitation);

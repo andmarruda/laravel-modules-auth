@@ -2,6 +2,8 @@
 
 namespace Andmarruda\AuthModule;
 
+use Andmarruda\AuthModule\Contracts\AuthenticatedUserPayloadExtenderInterface;
+use Andmarruda\AuthModule\Contracts\AuthChannelInterface;
 use Andmarruda\AuthModule\Infrastructure\Console\Commands\GenerateEddsaJwtKeysCommand;
 use Andmarruda\AuthModule\Infrastructure\Services\JwtManager;
 use Andmarruda\AuthModule\Infrastructure\Persistence\EloquentInvitationRepository;
@@ -20,6 +22,13 @@ use Andmarruda\AuthModule\Ports\Services\InvitationMailerInterface;
 use Andmarruda\AuthModule\Ports\Services\JwtManagerInterface;
 use Andmarruda\AuthModule\Ports\Services\OtpMailerInterface;
 use Andmarruda\AuthModule\Ports\Services\TokenGeneratorInterface;
+use Andmarruda\AuthModule\Support\Auth\JwtAuthChannel;
+use Andmarruda\AuthModule\Support\Auth\SanctumAuthChannel;
+use Andmarruda\AuthModule\Support\Auth\SessionAuthChannel;
+use Andmarruda\AuthModule\Support\AuthChannelManager;
+use Andmarruda\AuthModule\Support\AuthenticatedUserPayloadBuilder;
+use Andmarruda\AuthModule\Support\NullAuthenticatedUserPayloadExtender;
+use Andmarruda\AuthModule\Support\UserSettingsManager;
 use Illuminate\Auth\RequestGuard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,6 +51,21 @@ class AuthModuleServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/Config/authmodule.php', 'authmodule');
 
+        $this->app->bind(AuthenticatedUserPayloadExtenderInterface::class, function ($app): AuthenticatedUserPayloadExtenderInterface {
+            $configured = (string) config(
+                'authmodule.extenders.authenticated_user_payload',
+                NullAuthenticatedUserPayloadExtender::class,
+            );
+
+            $extender = $app->make($configured);
+
+            if ($extender instanceof AuthenticatedUserPayloadExtenderInterface) {
+                return $extender;
+            }
+
+            return new NullAuthenticatedUserPayloadExtender();
+        });
+
         $this->app->bind(JwtManagerInterface::class, static function (): JwtManagerInterface {
             return new JwtManager(
                 algorithm: (string) config('authmodule.jwt.algorithm', 'RS256'),
@@ -54,6 +78,21 @@ class AuthModuleServiceProvider extends ServiceProvider
                 issuer: (string) config('authmodule.jwt.issuer', 'authmodule'),
                 leewaySeconds: (int) config('authmodule.jwt.leeway_seconds', 0),
             );
+        });
+
+        $this->app->singleton(UserSettingsManager::class);
+        $this->app->singleton(AuthenticatedUserPayloadBuilder::class);
+
+        $this->app->singleton(AuthChannelManager::class, function ($app): AuthChannelManager {
+            return new AuthChannelManager([
+                $app->make(SessionAuthChannel::class),
+                $app->make(SanctumAuthChannel::class),
+                $app->make(JwtAuthChannel::class),
+            ]);
+        });
+
+        $this->app->bind(AuthChannelInterface::class, function ($app): AuthChannelInterface {
+            return $app->make(AuthChannelManager::class)->resolve();
         });
     }
 

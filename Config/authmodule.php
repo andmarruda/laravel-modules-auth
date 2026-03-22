@@ -5,10 +5,18 @@ return [
         'default_guard' => env('AUTHMODULE_DEFAULT_GUARD', 'web'),
         'session_guard' => env('AUTHMODULE_SESSION_GUARD', 'web'),
         'api_guard' => env('AUTHMODULE_API_GUARD', 'sanctum'),
+        'jwt_guard' => env('AUTHMODULE_JWT_GUARD', 'jwt'),
+        'default_channel' => env('AUTHMODULE_DEFAULT_CHANNEL', 'session'),
+        'auth_guards' => ['web', 'sanctum', 'jwt'],
         'invitation_create_guards' => ['web', 'sanctum'],
         'social_profile_guards' => ['web', 'sanctum'],
         'preferences_guards' => ['web', 'sanctum'],
         'teams_guards' => ['web', 'sanctum'],
+        'sanctum' => [
+            'token_name' => env('AUTHMODULE_SANCTUM_TOKEN_NAME', 'authmodule'),
+            'abilities' => ['*'],
+            'expires_at' => env('AUTHMODULE_SANCTUM_EXPIRES_AT'),
+        ],
     ],
     'jwt' => [
         'algorithm' => env('AUTHMODULE_JWT_ALGORITHM', 'RS256'),
@@ -43,5 +51,30 @@ return [
         'required_user_fields' => ['name'],
         'required_preference_keys' => [],
         'redirect_to_onboarding' => env('AUTHMODULE_PROFILE_ONBOARDING_PATH', '/complete-profile'),
+    ],
+    'settings' => [
+        'definitions' => [
+            'theme_mode' => [
+                'storage' => 'attribute',
+                'attribute' => 'theme_mode',
+                'rules' => ['nullable', 'string', 'max:50'],
+                'default' => null,
+            ],
+            'theme_mobile_mode' => [
+                'storage' => 'preference',
+                'key' => 'theme_mobile_mode',
+                'rules' => ['nullable', 'string', 'max:50'],
+                'default' => null,
+            ],
+            'monthly_salary' => [
+                'storage' => 'preference',
+                'key' => 'monthly_salary',
+                'rules' => ['nullable', 'numeric'],
+                'default' => null,
+            ],
+        ],
+    ],
+    'extenders' => [
+        'authenticated_user_payload' => \Andmarruda\AuthModule\Support\NullAuthenticatedUserPayloadExtender::class,
     ],
 ];

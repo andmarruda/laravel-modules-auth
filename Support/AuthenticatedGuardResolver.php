@@ -5,9 +5,9 @@ namespace Andmarruda\AuthModule\Support;
 use Andmarruda\AuthModule\Models\User;
 use Illuminate\Http\Request;
 
-class AuthenticatedUserResolver
+class AuthenticatedGuardResolver
 {
-    public static function resolve(Request $request): ?User
+    public static function resolve(Request $request): ?string
     {
         $guards = array_values(array_unique(array_filter([
             config('authmodule.auth.default_guard', 'web'),
@@ -23,12 +23,19 @@ class AuthenticatedUserResolver
 
             $candidate = $request->user($guard);
             if ($candidate instanceof User) {
-                return $candidate;
+                return $guard;
             }
         }
 
-        $fallback = $request->user();
+        return null;
+    }
 
-        return $fallback instanceof User ? $fallback : null;
+    public static function guardToChannel(?string $guard): string
+    {
+        return match ($guard) {
+            config('authmodule.auth.jwt_guard', 'jwt') => 'jwt',
+            config('authmodule.auth.api_guard', 'sanctum') => 'sanctum',
+            default => 'session',
+        };
     }
 }

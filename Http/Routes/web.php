@@ -2,11 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 use Andmarruda\AuthModule\Http\Controllers\{
+    AuthController,
     InvitationController,
     JwtAuthController,
     UserController,
     SocialAuthController,
     UserPreferenceController,
+    UserSettingsController,
     TeamController,
     TeamInvitationController
 };
@@ -24,6 +26,40 @@ $preferencesMiddleware = AuthMiddleware::fromGuards(
 $teamsMiddleware = AuthMiddleware::fromGuards(
     (array) config('authmodule.auth.teams_guards', ['web', 'sanctum']),
 );
+$authMiddleware = AuthMiddleware::fromGuards(
+    (array) config('authmodule.auth.auth_guards', ['web', 'sanctum', 'jwt']),
+);
+
+Route::group([
+    'prefix' => 'api/v1/auth',
+    'as' => 'api.v1.auth.',
+], function () use ($authMiddleware) {
+    Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/register', [AuthController::class, 'register'])->name('register');
+    Route::post('/password/reset', [AuthController::class, 'passwordReset'])->name('password.reset');
+
+    Route::get('/me', [AuthController::class, 'me'])
+        ->middleware($authMiddleware)
+        ->name('me');
+    Route::post('/refresh', [AuthController::class, 'refresh'])
+        ->middleware($authMiddleware)
+        ->name('refresh');
+    Route::post('/logout', [AuthController::class, 'logout'])
+        ->middleware($authMiddleware)
+        ->name('logout');
+});
+
+Route::group([
+    'prefix' => 'api/v1/user-settings',
+    'as' => 'api.v1.user-settings.',
+], function () use ($authMiddleware) {
+    Route::get('/', [UserSettingsController::class, 'show'])
+        ->middleware($authMiddleware)
+        ->name('show');
+    Route::put('/', [UserSettingsController::class, 'update'])
+        ->middleware($authMiddleware)
+        ->name('update');
+});
 
 Route::group([
     'prefix' => 'invitations',

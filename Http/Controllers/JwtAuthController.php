@@ -2,46 +2,37 @@
 
 namespace Andmarruda\AuthModule\Http\Controllers;
 
-use Andmarruda\AuthModule\Models\User;
-use Andmarruda\AuthModule\Ports\Services\JwtManagerInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Hash;
 
 class JwtAuthController extends Controller
 {
-    public function __construct(private JwtManagerInterface $jwtManager)
+    public function __construct(private AuthController $authController)
     {
     }
 
     public function token(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
-        ]);
+        $request->merge(['channel' => 'jwt']);
 
-        /** @var User|null $user */
-        $user = User::query()->where('email', strtolower(trim($validated['email'])))->first();
+        $response = $this->authController->login($request);
+        $data = $response->getData(true);
 
-        if (!$user instanceof User || !Hash::check($validated['password'], $user->password)) {
-            return response()->json(['message' => 'Invalid credentials.'], 401);
+        if (($response->getStatusCode() >= 400) || !is_array($data)) {
+            return $response;
         }
-
-        $token = $this->jwtManager->issueToken($user);
 
         return response()->json([
             'data' => [
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'expires_in' => max(1, (int) config('authmodule.jwt.ttl_minutes', 60)) * 60,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                ],
+                'access_token' => $data['token'] ?? null,
+                'token_type' => $data['type'] ?? null,
+                'expires_in' => $data['expires_in'] ?? null,
+                'user' => $data['user'] ?? null,
+                'roles' => $data['roles'] ?? [],
+                'permissions' => $data['permissions'] ?? [],
+                'plan' => $data['plan'] ?? null,
             ],
-        ]);
+        ], $response->getStatusCode(), $response->headers->all());
     }
 }
